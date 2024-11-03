@@ -88,11 +88,15 @@ bool AHT30_ReadTempHum(float *temperature, float *humidity, struct AHT30_Status 
 
     // Read humidity
     uint32_t srhDat = (data[1] << 12) | (data[2] << 4) | (data[3] >> 4);
-    *humidity = (float)srhDat / 1048576.0f * 100.0f;
+    // *humidity = (float)srhDat / 1048576.0f * 100.0f;
+    srhDat >>= 8; // Drop low bits to fit calculations in single-precision float
+    *humidity = (float)srhDat / 4096.0f * 100.0f;
     
     // Read temperature
     uint32_t stDat = ((data[3] & 0x0F) << 16) | (data[4] << 8) | data[5];
-    *temperature = (float)stDat / 1048576.0f * 200.0f - 50.0f;
+    // *temperature = (float)stDat / 1048576.0f * 200.0f - 50.0f;
+    stDat >>= 8; // Drop low bits to fit calculations in single-precision float
+    *temperature = (float)stDat / 4096.0f * 200.0f - 50.0f;
 
     return true;
 }
